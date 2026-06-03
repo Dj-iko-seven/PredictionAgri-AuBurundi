@@ -201,10 +201,57 @@ html, body, [data-testid="stAppViewContainer"] {
   padding: 0.65rem 2rem !important;
   box-shadow: 0 4px 12px rgba(45,106,79,0.35) !important;
   transition: all 0.2s !important;
+  width: 100% !important;
 }
 .stButton > button:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 20px rgba(45,106,79,0.45) !important;
+}
+
+/* ── Top header & menu ── */
+.top-header {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 60%, var(--green-light) 100%);
+  border-radius: 20px;
+  padding: 2rem 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+.top-header h1 {
+  font-family: 'Syne', sans-serif !important;
+  font-size: 2.4rem !important;
+  font-weight: 800 !important;
+  margin: 0 0 0.35rem !important;
+}
+.top-header .subtitle {
+  color: rgba(255,255,255,0.9) !important;
+  font-size: 1rem !important;
+  margin: 0 0 0.85rem !important;
+  line-height: 1.5 !important;
+}
+.top-header .author {
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+.top-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+.top-menu .stButton {
+  flex: 1 1 220px;
+  min-width: 160px;
+}
+.top-menu .stButton > button {
+  border-radius: 999px !important;
+  padding: 0.85rem 1.6rem !important;
+  font-size: 0.97rem !important;
+}
+.top-menu .stButton > button:focus {
+  outline: 2px solid rgba(255,255,255,0.7) !important;
+  outline-offset: 2px !important;
 }
 
 /* ── Metrics ── */
@@ -319,6 +366,28 @@ df_raw = load_raw()
 df     = prepare_data(df_raw)
 models, results, X_tr, X_te, y_tr, y_te = train_all_models(df)
 
+MENU_OPTIONS = [
+    "🏠  Accueil",
+    "📊  Exploration des Données",
+    "⚙️  Prétraitement",
+    "🌳  Arbre de Décision",
+    "🌲  Forêt Aléatoire",
+    "📈  Régression Logistique",
+    "📉  Comparaison ROC",
+    "🔮  Prédiction Scénarios",
+    "🎯  Prédiction Personnalisée",
+]
+
+PROCEDURE_PAGES = [
+    "📊  Exploration des Données",
+    "⚙️  Prétraitement",
+    "🌳  Arbre de Décision",
+    "🌲  Forêt Aléatoire",
+    "📈  Régression Logistique",
+    "📉  Comparaison ROC",
+    "🔮  Prédiction Scénarios",
+]
+
 # ═══════════════════════════════════════════════════════════════════
 # SIDEBAR
 # ═══════════════════════════════════════════════════════════════════
@@ -326,35 +395,55 @@ with st.sidebar:
     st.markdown("## 🌱 AgriPredict")
     st.markdown("**Université Polytechnique de Gitega**  \nBac4 — Génie Logiciel")
     st.markdown("---")
-    page = st.radio(
-        "Navigation",
-        [
-            "🏠  Accueil",
-            "📊  Exploration des Données",
-            "⚙️  Prétraitement",
-            "🌳  Arbre de Décision",
-            "🌲  Forêt Aléatoire",
-            "📈  Régression Logistique",
-            "📉  Comparaison ROC",
-            "🔮  Prédiction Scénarios",
-            "🎯  Prédiction Personnalisée",
-        ],
-        label_visibility="collapsed",
-    )
-    st.markdown("---")
     st.caption("TP IA Appliquée — 2025/2026")
+
+# ═══════════════════════════════════════════════════════════════════
+# TOP HEADER
+# ═══════════════════════════════════════════════════════════════════
+st.markdown("""
+<div class="top-header">
+  <h1>🌱 AgriPredict Burundi</h1>
+  <p class="subtitle">Prédiction des bonnes et mauvaises récoltes par Machine Learning · TP Bac4 Génie Logiciel</p>
+  <div class="author">IKORIVYIZA Seth</div>
+</div>
+""", unsafe_allow_html=True)
+
+if "page" not in st.session_state:
+    st.session_state.page = "🏠  Accueil"
+if "procedure_page" not in st.session_state:
+    st.session_state.procedure_page = PROCEDURE_PAGES[0]
+
+# ═══════════════════════════════════════════════════════════════════
+# MAIN MENU
+# ═══════════════════════════════════════════════════════════════════
+col1, col2, col3 = st.columns([1, 1, 1], gap="large")
+with col1:
+    if st.button("A propos", key="menu_apropos"):
+        st.session_state.page = "🏠  Accueil"
+with col2:
+    if st.button("Prédiction des récoltes", key="menu_prediction"):
+        st.session_state.page = "🎯  Prédiction Personnalisée"
+with col3:
+    if st.button("Procédure", key="menu_procedure"):
+        st.session_state.page = "Procédure"
+
+st.markdown("---")
+
+if st.session_state.page == "Procédure" or st.session_state.page in PROCEDURE_PAGES:
+    st.markdown("### Procédure")
+    proc_cols = st.columns(4, gap="large")
+    for idx, option in enumerate(PROCEDURE_PAGES):
+        with proc_cols[idx % 4]:
+            if st.button(option, key=f"proc_{idx}"):
+                st.session_state.page = option
+                st.session_state.procedure_page = option
+
+page = st.session_state.page
 
 # ═══════════════════════════════════════════════════════════════════
 # PAGE : ACCUEIL
 # ═══════════════════════════════════════════════════════════════════
 if page == "🏠  Accueil":
-    st.markdown("""
-    <div class="app-header">
-      <h1>🌱 AgriPredict Burundi</h1>
-      <p>Prédiction des bonnes et mauvaises récoltes par Machine Learning · TP Bac4 Génie Logiciel</p>
-    </div>
-    """, unsafe_allow_html=True)
-
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("📋 Observations",      f"{len(df):,}")
     c2.metric("🗺️ Provinces",         df['province'].nunique())
